@@ -83,6 +83,9 @@ class ShoppingTableViewController: UITableViewController {
         //        cell.textLabel?.text = gros[indexPath.row]
         let grocery = groceries[indexPath.row]
         cell.textLabel?.text = grocery.value(forKey: "item") as? String
+        cell.selectionStyle = .none
+        cell.accessoryType = grocery.completed ? .checkmark : .none
+        
         return cell
     }
     
@@ -95,41 +98,31 @@ class ShoppingTableViewController: UITableViewController {
     }
     */
 
-    /*
-    // Override to support editing the table view.
+    
+    //-------> to add delete option
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            managedObjectContext?.delete(groceries[indexPath.row])
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
+        do {
+            try self.managedObjectContext?.save()
+        }catch{
+            fatalError("Error in deleting item")
+        }
+    //-------> nedd to load because it reloads tableview, dont't nedd self., becouse it's no in closure
+       loadData()
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+    //-------> to deselect checkmark
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        groceries[indexPath.row].completed = !groceries[indexPath.row].completed
+        do {
+            try self.managedObjectContext?.save()
+        }catch{
+            fatalError("Error in deleting item")
+        }
+        loadData()
     }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
