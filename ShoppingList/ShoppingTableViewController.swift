@@ -109,7 +109,7 @@ class ShoppingTableViewController: UITableViewController {
         }
         loadData()
     }
-    //-------> to add delete option
+    //-------> to add delete option and alert
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let alert = UIAlertController(title: "Are you sure you want to delete?", message: nil, preferredStyle: .alert)
@@ -126,5 +126,13 @@ class ShoppingTableViewController: UITableViewController {
           }catch{
               fatalError("Error in deleting item")
           }
+    }
+    
+    //-------> to add an animation to cells
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        UIView.animate(withDuration: 0.8){
+            cell.transform = CGAffineTransform.identity
+        }
     }
 }
