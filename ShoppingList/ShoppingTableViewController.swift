@@ -98,25 +98,6 @@ class ShoppingTableViewController: UITableViewController {
     }
     */
     
-    //-------> to add delete option
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            let alert = UIAlertController(title: "Are You sure you want to delete?", message: nil, preferredStyle: .alert)
-                       alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-                       alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { (_) in
-                        self.managedObjectContext?.delete(self.groceries[indexPath.row])
-            tableView.reloadRows(at: [indexPath], with: .automatic)
-        }))
-             self.present(alert, animated: true)
-          do {
-              try self.managedObjectContext?.save()
-          }catch{
-              fatalError("Error in deleting item")
-          }
-           loadData()
-        }
-    }
-    
     //-------> to deselect checkmark
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -128,5 +109,22 @@ class ShoppingTableViewController: UITableViewController {
         }
         loadData()
     }
-
+    //-------> to add delete option
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let alert = UIAlertController(title: "Are you sure you want to delete?", message: nil, preferredStyle: .alert)
+                       alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                       alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { (_) in
+                        self.managedObjectContext?.delete(self.groceries[indexPath.row])
+                        UIView.transition(with: tableView, duration: 1.0, options: .transitionCurlUp, animations: {
+                            self.loadData()
+                        }, completion: nil)
+                       }))
+            self.present(alert, animated: true)}
+        do {
+              try self.managedObjectContext?.save()
+          }catch{
+              fatalError("Error in deleting item")
+          }
+    }
 }
