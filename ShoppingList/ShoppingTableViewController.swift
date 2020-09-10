@@ -10,10 +10,10 @@ import UIKit
 import CoreData
 
 class ShoppingTableViewController: UITableViewController {
-
+    
     var groceries = [Grocery]()
     //------->create temporary grocery
-//    var gros = [String]()
+    //    var gros = [String]()
     
     var managedObjectContext: NSManagedObjectContext?
     
@@ -41,12 +41,15 @@ class ShoppingTableViewController: UITableViewController {
             //            self.tableView.reloadData()
             let entity = NSEntityDescription.entity(forEntityName: "Grocery", in: self.managedObjectContext!)
             let grocery = NSManagedObject(entity: entity!, insertInto: self.managedObjectContext)
+            //-------> to add text to item
             grocery.setValue(textField?.text, forKey: "item")
+            //-------> to save text to Grocery
             do {
                 try self.managedObjectContext?.save()
             }catch{
                 fatalError("Error to store Grocery item")
             }
+            //-------> nedd to load because it reloads tableview
             self.loadData()
         }//end addAction
         let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
@@ -55,7 +58,7 @@ class ShoppingTableViewController: UITableViewController {
         present(alertController, animated: true)
     }
     
-    
+    //-------> to fetch and reload a tableview
     func loadData(){
         let request: NSFetchRequest<Grocery> = Grocery.fetchRequest()
         do{
@@ -72,20 +75,20 @@ class ShoppingTableViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         return groceries.count
     }
-
-
+    
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "shoppingCell", for: indexPath)
-
-//        cell.textLabel?.text = gros[indexPath.row]
+        
+        //        cell.textLabel?.text = gros[indexPath.row]
         let grocery = groceries[indexPath.row]
         cell.textLabel?.text = grocery.value(forKey: "item") as? String
         return cell
     }
-
-
+    
+    
     /*
-    // Override to support conditional editing of the table view.
+     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
