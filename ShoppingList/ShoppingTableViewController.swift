@@ -13,7 +13,7 @@ class ShoppingTableViewController: UITableViewController {
 
     var groceries = [Grocery]()
     //------->create temporary grocery
-    var gros = [String]()
+//    var gros = [String]()
     
     var managedObjectContext: NSManagedObjectContext?
     
@@ -23,6 +23,7 @@ class ShoppingTableViewController: UITableViewController {
         
         let appDeleggate = UIApplication.shared.delegate as! AppDelegate
         managedObjectContext = appDeleggate.persistentContainer.viewContext
+        loadData()
     }
     
     @IBAction func addNewItemTaped(_ sender: Any) {
@@ -34,24 +35,20 @@ class ShoppingTableViewController: UITableViewController {
         let alertController = UIAlertController(title: "Grocery Item!", message: "What do you want to buy?", preferredStyle: .alert)
         alertController.addTextField { (textField: UITextField) in
         }
-    //-------> present one by one in texfield
         let addAction = UIAlertAction(title: "Add", style: .cancel) { (action: UIAlertAction) in
-            
             let textField = alertController.textFields?.first
-            
-            self.gros.append((textField!.text)!)
-            self.tableView.reloadData()
-//            let entity = NSEntityDescription.entity(forEntityName: "Grocery", in: self.managedObjectContext!)
-//            let grocery = NSManagedObject(entity: entity!, insertInto: self.managedObjectContext)
-//            grocery.setValue(textField, forKey: "item")
-//            do{
-//                try self.managedObjectContext?.save()
-//            }catch{
-//                fatalError("Error to store Grocery item")
-//                }
-                //loadData()
-        }//addAction
-        
+            //            self.gros.append(textField!.text!)
+            //            self.tableView.reloadData()
+            let entity = NSEntityDescription.entity(forEntityName: "Grocery", in: self.managedObjectContext!)
+            let grocery = NSManagedObject(entity: entity!, insertInto: self.managedObjectContext)
+            grocery.setValue(textField?.text, forKey: "item")
+            do {
+                try self.managedObjectContext?.save()
+            }catch{
+                fatalError("Error to store Grocery item")
+            }
+            self.loadData()
+        }//end addAction
         let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
         alertController.addAction(addAction)
         alertController.addAction(cancelAction)
@@ -59,18 +56,30 @@ class ShoppingTableViewController: UITableViewController {
     }
     
     
+    func loadData(){
+        let request: NSFetchRequest<Grocery> = Grocery.fetchRequest()
+        do{
+            let result = try managedObjectContext?.fetch(request)
+            groceries = result!
+            tableView.reloadData()
+        }catch{
+            fatalError("Error in retrieving Grocery items")
+        }
+    }
+    
     // MARK: - Table view data source
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return gros.count
+        return groceries.count
     }
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "shoppingCell", for: indexPath)
 
-        cell.textLabel?.text = gros[indexPath.row]
-
+//        cell.textLabel?.text = gros[indexPath.row]
+        let grocery = groceries[indexPath.row]
+        cell.textLabel?.text = grocery.value(forKey: "item") as? String
         return cell
     }
 
